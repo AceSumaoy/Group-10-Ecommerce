@@ -49,11 +49,6 @@ function ProductPage() {
     setCart(updatedCart);
   };
 
-  const checkout= () => {
-    setCart([]);
-    console.log(cart);
-  };
-
   const product = [
     { id: 1, name: "Hotdog", price: "15", description: "Mahaba na mainit" },
     { id: 2, name: "Burger", price: "35", description: "Plat na mainit" },
@@ -97,7 +92,7 @@ function ProductPage() {
       {!showCart && <button onClick={() => setShowCart(true)}>View Cart</button>}
       {showCart && (
         <Modal onClose={() => setShowCart(false)}>
-          <ViewCart cart={cart} removeFromCart={removeFromCart} checkout={checkout}/>
+          <ViewCart cart={cart} removeFromCart={removeFromCart}/>
         </Modal>
       )}
       
