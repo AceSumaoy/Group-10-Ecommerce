@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import ProductInfo from './ProductInfo';
 import ViewCart from './ViewCart';
 import Modal from './Modal';
 import axios from 'axios';
