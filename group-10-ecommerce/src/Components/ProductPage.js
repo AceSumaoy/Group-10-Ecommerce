@@ -1,27 +1,31 @@
 import React, { useState } from 'react';
 import ProductInfo from './ProductInfo';
-import ProductSummary from './ProductSummary';
 import ViewCart from './ViewCart';
 import Modal from './Modal';
+import axios from 'axios';
+import { useEffect } from 'react';
+import "../../src/Styles.css";
 
 function ProductPage() {
 
-  const products = [
-    { id: 1, name: 'Hotdog', price: '15', description: 'Mahaba na mainit' },
-    { id: 2, name: 'Burger', price: '35', description: 'Plat na mainit' },
-    { id: 3, name: 'Siopao', price: '25', description: 'Bilog na mainit' },
-    { id: 4, name: 'Footlong', price: '45', description: 'Mas mahaba na mainit' },
-    { id: 5, name: 'Turon', price: '20', description: 'Mahaba din pero saging' },
-    { id: 6, name: 'Tao', price: '10000000', description: 'Mahaba din to kaso buhay' },
-    { id: 7, name: 'Fishball', price: '1', description: 'Maliit na bilog na mainit' },
-    { id: 8, name: 'KwekKwek', price: '10', description: 'Description' },
-    { id: 9, name: 'Kikkyam', price: '2', description: 'Description' },
-    { id: 10, name: 'Shawarma', price: '80', description: 'Description' },
-  ];
-
+  const [products, setProducts] = useState(null);
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
 
+  useEffect(() =>{
+    const getProducts = async (url) => {
+      try{
+        const fetch = await axios.get(url);
+        setProducts(fetch.data);
+      } catch (error){
+        console.log(error);
+      }
+    };
+  
+    getProducts("http://127.0.0.1:8000/api/products");
+  }, []);
+  
   const addToCart = (product) => {
     const existingProduct = cart.find(item => item.id === product.id);
 
@@ -33,6 +37,9 @@ function ProductPage() {
     } else {
       setCart(prevCart => [...prevCart, { ...product, quantity: 1 }]);
     }
+
+    setShowPopup(true); // Show the popup when an item is added to the cart
+    setTimeout(() => setShowPopup(false), 2000); // Hide the popup after 2 seconds
   };
 
   const removeFromCart = (productId, decrement = false) => {
@@ -49,69 +56,40 @@ function ProductPage() {
     setCart(updatedCart);
   };
 
-  const checkout= () => {
-    console.log(cart)
+  const checkout = () => {
+    console.log(cart);
     setCart([]);
   };
 
-  const product = [
-    { id: 1, name: "Hotdog", price: "15", description: "Mahaba na mainit" },
-    { id: 2, name: "Burger", price: "35", description: "Plat na mainit" },
-    { id: 3, name: "Siopao", price: "25", description: "Bilog na mainit" },
-    {
-      id: 4,
-      name: "Footlong",
-      price: "45",
-      description: "Mas mahaba na mainit",
-    },
-
-    {
-      id: 5,
-      name: "Turon",
-      price: "20",
-      description: "Mahaba din pero saging",
-    },
-
-    {
-      id: 6,
-      name: "Tao",
-      price: "10000000",
-      description: "Mahaba din to kaso buhay",
-    },
-
-    {
-      id: 7,
-      name: "Fishball",
-      price: "1",
-      description: "Maliit na bilog na mainit",
-    },
-
-    { id: 8, name: "KwekKwek", price: "10", description: "Description" },
-    { id: 9, name: "Kikkyam", price: "2", description: "Description" },
-    { id: 10, name: "Shawarma", price: "80", description: "Description" },
-  ];
-
   return (
-    <div>
-      <ProductSummary cart={cart} />
+    <div className="container">
       {!showCart && <button onClick={() => setShowCart(true)}>View Cart</button>}
       {showCart && (
         <Modal onClose={() => setShowCart(false)}>
-          <ViewCart cart={cart} removeFromCart={removeFromCart} checkout={checkout}/>
+          <ViewCart cart={cart} removeFromCart={removeFromCart} checkout={checkout} />
         </Modal>
       )}
-      
+
+      <br></br><br></br>
       <h1>PRODUCTS</h1>
-      {products.map(product => (
-        <ProductInfo 
-          key={product.id} 
-          id={product.id}
-          name={product.name} 
-          price={product.price} 
-          description={product.description} 
-          onAddToCart={() => addToCart(product)} 
-        />
-      ))}
+      <div className="products-container">
+        {products?.map(product => (
+          <div key={product.id} className="product-card">
+            <h3>{product.name}</h3>
+            <p>{product.desc}</p>
+            <button onClick={() => addToCart(product)}>Add to Cart</button>
+          </div>
+        ))}
+      </div>
+
+      {/* Popup Modal */}
+      {showPopup && (
+        <Modal onClose={() => setShowPopup(false)}>
+          <div className="popup">
+            <h2>Item Added to Cart</h2>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }
